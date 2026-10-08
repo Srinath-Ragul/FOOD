@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Smart Food Ordering System</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            🍴 Smart Food
+        </div>
+
+        <div class="nav-links">
+
+            <button onclick="showSection('home')">
+                Home
+            </button>
+
+            <button onclick="showSection('restaurants')">
+                Restaurants
+            </button>
+
+            <button onclick="showSection('orders')">
+                My Orders
+            </button>
+
+            <button onclick="showCart()">
+                🛒 Cart
+                <span id="cart-count">0</span>
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- HOME -->
+
+    <section
+        id="home"
+        class="section active"
+    >
+
+        <div class="hero">
+
+            <div>
+
+                <h1>
+                    Smart Food Ordering
+                </h1>
+
+                <p>
+                    Order delicious food from
+                    restaurants around Madurai.
+                </p>
+
+                <button
+                    class="primary-btn"
+                    onclick="showSection('restaurants')"
+                >
+                    Explore Restaurants
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="features">
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    🍽️
+                </div>
+
+                <h3>
+                    Easy Ordering
+                </h3>
+
+                <p>
+                    Browse menus and place orders
+                    easily.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    🚴
+                </div>
+
+                <h3>
+                    Smart Delivery
+                </h3>
+
+                <p>
+                    Choose normal, express or
+                    premium delivery.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    🔔
+                </div>
+
+                <h3>
+                    Live Updates
+                </h3>
+
+                <p>
+                    Track your order status and
+                    notifications.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- RESTAURANTS -->
+
+    <section
+        id="restaurants"
+        class="section"
+    >
+
+        <div class="section-header">
+
+            <h2>
+                Restaurants in Madurai
+            </h2>
+
+            <p>
+                Choose a restaurant to explore
+                its menu.
+            </p>
+
+        </div>
+
+
+        <div
+            id="restaurant-list"
+            class="restaurant-grid"
+        >
+
+            <div class="loading">
+                Loading restaurants...
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- MENU -->
+
+    <section
+        id="menu"
+        class="section"
+    >
+
+        <div class="section-header">
+
+            <button
+                class="back-btn"
+                onclick="showSection('restaurants')"
+            >
+                ← Back
+            </button>
+
+            <h2 id="restaurant-name">
+                Restaurant Menu
+            </h2>
+
+            <p id="restaurant-location"></p>
+
+        </div>
+
+
+        <div
+            id="food-list"
+            class="food-grid"
+        >
+
+            <div class="loading">
+                Loading menu...
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CART -->
+
+    <section
+        id="cart"
+        class="section"
+    >
+
+        <div class="section-header">
+
+            <h2>
+                🛒 Your Cart
+            </h2>
+
+        </div>
+
+
+        <div
+            id="cart-items"
+            class="cart-container"
+        ></div>
+
+
+        <div
+            id="cart-summary"
+            class="cart-summary"
+        ></div>
+
+    </section>
+
+
+    <!-- CHECKOUT -->
+
+    <section
+        id="checkout"
+        class="section"
+    >
+
+        <div class="section-header">
+
+            <button
+                class="back-btn"
+                onclick="showCart()"
+            >
+                ← Back to Cart
+            </button>
+
+            <h2>
+                Checkout
+            </h2>
+
+        </div>
+
+
+        <div class="checkout-container">
+
+
+            <!-- ORDER SUMMARY -->
+
+            <div class="checkout-card">
+
+                <h3>
+                    Order Summary
+                </h3>
+
+                <div id="checkout-items"></div>
+
+                <hr>
+
+                <div class="checkout-total">
+
+                    <span>
+                        Food Amount
+                    </span>
+
+                    <span id="checkout-food-total">
+                        ₹0
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- DELIVERY -->
+
+            <div class="checkout-card">
+
+                <h3>
+                    🚴 Delivery
+                </h3>
+
+
+                <label>
+                    <input
+                        type="radio"
+                        name="delivery"
+                        value="normal"
+                        checked
+                    >
+
+                    Normal Delivery
+                </label>
+
+
+                <label>
+                    <input
+                        type="radio"
+                        name="delivery"
+                        value="express"
+                    >
+
+                    Express Delivery
+                </label>
+
+
+                <label>
+                    <input
+                        type="radio"
+                        name="delivery"
+                        value="premium"
+                    >
+
+                    Premium Delivery
+                </label>
+
+            </div>
+
+
+            <!-- PAYMENT -->
+
+            <div class="checkout-card">
+
+                <h3>
+                    💳 Payment
+                </h3>
+
+
+                <label>
+                    <input
+                        type="radio"
+                        name="payment"
+                        value="upi"
+                        checked
+                    >
+
+                    UPI
+                </label>
+
+
+                <label>
+                    <input
+                        type="radio"
+                        name="payment"
+                        value="card"
+                    >
+
+                    Card
+                </label>
+
+            </div>
+
+
+            <button
+                class="place-order-btn"
+                onclick="placeOrder()"
+            >
+                Place Order
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- ORDERS -->
+
+    <section
+        id="orders"
+        class="section"
+    >
+
+        <div class="section-header">
+
+            <h2>
+                📦 My Orders
+            </h2>
+
+            <p>
+                Track your recent orders.
+            </p>
+
+        </div>
+
+
+        <div
+            id="order-list"
+            class="order-list"
+        >
+
+            <div class="empty-state">
+
+                <div>
+                    📦
+                </div>
+
+                <p>
+                    No orders yet.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- NOTIFICATION -->
+
+    <div
+        id="notification"
+        class="notification"
+    ></div>
+
+
+    <script
+        src="{{ url_for('static', filename='app.js') }}"
+    ></script>
+
+</body>
+
+</html>

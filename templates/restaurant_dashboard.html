@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Restaurant Dashboard
+    </title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #222;
+        }
+
+        .navbar {
+            background: white;
+            padding: 20px 7%;
+            box-shadow:
+                0 2px 10px
+                rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h2 {
+            margin: 0;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #111;
+        }
+
+        .container {
+            width: 86%;
+            margin: 40px auto;
+        }
+
+        .order-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow:
+                0 4px 15px
+                rgba(0,0,0,0.06);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status {
+            padding: 7px 14px;
+            border-radius: 20px;
+            background: #eee;
+            font-weight: bold;
+        }
+
+        .next-btn {
+            border: none;
+            background: #111;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .next-btn:hover {
+            opacity: 0.85;
+        }
+
+        .notification {
+            margin-top: 15px;
+            padding: 12px;
+            background: #f3f3f3;
+            border-radius: 8px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="navbar">
+
+        <h2>
+            🍴 Amma Mess — Restaurant Dashboard
+        </h2>
+
+        <a href="/">
+            ← Customer App
+        </a>
+
+    </div>
+
+
+    <div class="container">
+
+        <h1>
+            Restaurant Orders
+        </h1>
+
+        <p>
+            Restaurant staff can update order status
+            from this dashboard.
+        </p>
+
+
+        <div id="orders">
+
+            Loading orders...
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        async function loadOrders() {
+
+            const container =
+                document.getElementById(
+                    "orders"
+                );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/admin/orders"
+                    );
+
+
+                const orders =
+                    await response.json();
+
+
+                container.innerHTML = "";
+
+
+                if (
+                    orders.length === 0
+                ) {
+
+                    container.innerHTML =
+                        "<p>No orders available.</p>";
+
+                    return;
+
+                }
+
+
+                orders.forEach(
+                    order => {
+
+                        const card =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        card.className =
+                            "order-card";
+
+
+                        const finished =
+                            order.status ===
+                            "DELIVERED";
+
+
+                        card.innerHTML = `
+
+                            <div
+                                class="order-header"
+                            >
+
+                                <h3>
+                                    Order #${order.id}
+                                </h3>
+
+                                <span
+                                    class="status"
+                                >
+                                    ${order.status}
+                                </span>
+
+                            </div>
+
+
+                            <p>
+                                Customer:
+                                ${order.customer_name || "Customer"}
+                            </p>
+
+
+                            <p>
+                                Restaurant:
+                                ${order.restaurant_name || "Restaurant"}
+                            </p>
+
+
+                            <p>
+                                Total:
+                                <strong>
+                                    ₹${order.total_amount}
+                                </strong>
+                            </p>
+
+
+                            ${
+                                finished
+                                ?
+
+                                `
+                                    <p>
+                                        🎉 Order Delivered
+                                    </p>
+                                `
+
+                                :
+
+                                `
+                                    <button
+                                        class="next-btn"
+                                        onclick="moveNext(
+                                            ${order.id}
+                                        )"
+                                    >
+                                        Move to Next Status
+                                    </button>
+                                `
+                            }
+
+
+                            <div
+                                id="notifications-${order.id}"
+                            ></div>
+
+                        `;
+
+
+                        container.appendChild(
+                            card
+                        );
+
+                    }
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(error);
+
+                container.innerHTML =
+                    "<p>Unable to load orders.</p>";
+
+            }
+
+        }
+
+
+        async function moveNext(
+            orderId
+        ) {
+
+            try {
+
+                const response =
+                    await fetch(
+                        `/admin/orders/${orderId}/next`,
+                        {
+                            method: "PUT"
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    alert(
+                        result.error ||
+                        "Unable to update order"
+                    );
+
+                    return;
+
+                }
+
+
+                const notificationContainer =
+                    document.getElementById(
+                        `notifications-${orderId}`
+                    );
+
+
+                if (
+                    notificationContainer &&
+                    result.notifications
+                ) {
+
+                    notificationContainer.innerHTML =
+                        result.notifications
+                            .map(
+                                message =>
+                                    `<div class="notification">
+                                        🔔 ${message}
+                                    </div>`
+                            )
+                            .join("");
+
+                }
+
+
+                setTimeout(
+                    loadOrders,
+                    1000
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(error);
+
+                alert(
+                    "Unable to update order"
+                );
+
+            }
+
+        }
+
+
+        loadOrders();
+
+
+        setInterval(
+            loadOrders,
+            5000
+        );
+
+    </script>
+
+</body>
+
+</html>
